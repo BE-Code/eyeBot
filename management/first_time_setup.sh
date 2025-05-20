@@ -1,0 +1,74 @@
+#!/bin/bash
+
+set -e
+
+# -- Config --
+SCRIPT_NAME="main.py"
+SERVICE_NAME="robot-animation"
+VENV_DIR="venv"
+
+echo "=== Robot Setup Starting ==="
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+REPO_DIR="$(dirname "$SCRIPT_DIR")"
+ORIGINAL_DIR="$(pwd)"
+
+# Change to project root
+cd "$REPO_DIR"
+
+# -- Install system dependencies --
+sudo apt update
+sudo apt install -y python3-pip python3-venv git fbset
+
+# -- Set SDL framebuffer environment in .bashrc --
+if ! grep -q "SDL_VIDEODRIVER=fbcon" /home/pi/.bashrc; then
+    echo "Setting framebuffer environment..."
+    echo 'export SDL_VIDEODRIVER=fbcon' >> /home/pi/.bashrc
+    echo 'export SDL_FBDEV=/dev/fb0' >> /home/pi/.bashrc
+fi
+
+# -- Create and activate virtual environment --
+python3 -m venv "$VENV_DIR"
+source "$VENV_DIR/bin/activate"
+
+# -- Install Python dependencies --
+pip install --upgrade pip
+if [ -f "requirements.txt" ]; then
+    pip install -r requirements.txt
+else
+    echo "Error: requirements.txt not found"
+    exit 1
+fi
+
+# -- Create systemd service --
+SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
+
+sudo bash -c "cat > $SERVICE_FILE" <<EOF
+[Unit]
+Description=Robot Animation
+After=multi-user.target
+
+[Service]
+ExecStart=$REPO_DIR/management/boot.sh
+WorkingDirectory=$REPO_DIR
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+Environment=SDL_VIDEODRIVER=fbcon
+Environment=SDL_FBDEV=/dev/fb0
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# -- Enable and start the service --
+sudo systemctl daemon-reexec
+sudo systemctl enable $SERVICE_NAME
+sudo systemctl start $SERVICE_NAME
+
+# Return to original directory
+cd "$ORIGINAL_DIR"
+
+echo "=== Setup Complete! ==="
+echo "Robot should now be running on HDMI display."
+echo "To update: Restart or SSH in and run 'sudo systemctl restart $SERVICE_NAME'"

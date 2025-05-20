@@ -22,15 +22,14 @@ echo "On macOS (using Homebrew): brew install python"
 echo "---------------------------------------------------------------------"
 read -p "Press [Enter] to continue after ensuring dependencies are met..."
 
-# -- Create and activate virtual environment --
+# -- Create virtual environment --
 echo "Creating Python virtual environment in $VENV_DIR..."
 python3 -m venv "$VENV_DIR"
 
-echo "Activating virtual environment..."
-echo "To activate it manually in the future, run: source $VENV_DIR/bin/activate"
+# -- Install Python dependencies (will use the new venv automatically if script is sourced or pip is called from venv) --
+echo "Activating virtual environment to install packages..."
 source "$VENV_DIR/bin/activate"
 
-# -- Install Python dependencies --
 echo "Installing/updating pip..."
 pip install --upgrade pip
 
@@ -47,6 +46,8 @@ cd "$ORIGINAL_DIR"
 echo "
 === Development Setup Complete! ===
 Virtual environment '$VENV_DIR' is ready in the project root: $REPO_DIR
-To activate it, navigate to $REPO_DIR and run: source $VENV_DIR/bin/activate
-To run the application, use: python $SCRIPT_NAME (after activating the venv)
+To run the application, navigate to $REPO_DIR and use: ./management/start.sh
+
+If you need to install more packages or run Python tools directly,
+activate the environment first with: source $VENV_DIR/bin/activate
 "

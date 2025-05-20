@@ -1,5 +1,39 @@
+import pygame
+import sys
+
 def main():
-    print("Hello, world!")
+    pygame.init()
+
+    # Screen dimensions
+    screen_width = 800
+    screen_height = 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    pygame.display.set_caption("Pygame Hello World")
+
+    # Colors
+    white = (255, 255, 255)
+    black = (0, 0, 0)
+
+    # Font
+    font = pygame.font.Font(None, 74)
+    text_surface = font.render("Hello, World!", True, black)
+    text_rect = text_surface.get_rect(center=(screen_width // 2, screen_height // 2))
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+
+        screen.fill(white)
+        screen.blit(text_surface, text_rect)
+        pygame.display.flip()
+
+    pygame.quit()
+    sys.exit()
 
 if __name__ == "__main__":
     main()

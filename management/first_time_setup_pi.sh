@@ -21,7 +21,7 @@ cd "$REPO_DIR"
 
 # -- Install system dependencies --
 sudo apt update
-sudo apt install -y python3-pip python3-venv git fbset
+sudo apt install -y python3-pip python3-venv git fbset libsdl2-dev python3-sdl2 libsdl2-ttf-dev libsdl2-image-dev
 
 # -- Create and activate virtual environment --
 python3 -m venv "$VENV_DIR"
@@ -34,6 +34,13 @@ if [ -f "requirements.txt" ]; then
 else
     echo "Error: requirements.txt not found"
     exit 1
+fi
+
+# -- Enable framebuffer support --
+if ! grep -q "dtoverlay=vc4-fkms-v3d" /boot/config.txt; then
+    echo "Adding framebuffer support to /boot/config.txt"
+    sudo bash -c "echo 'dtoverlay=vc4-fkms-v3d' >> /boot/config.txt"
+    echo "Note: A reboot will be required for framebuffer changes to take effect"
 fi
 
 # -- Create systemd service --

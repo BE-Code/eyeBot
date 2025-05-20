@@ -1,13 +1,9 @@
 import pygame
-import platform
 import sys
 import os
 
 def setup_environment():
-    # Detect Raspberry Pi (Linux ARM)
-    is_pi = platform.system() == "Linux" and os.uname().machine.startswith("arm")
-
-    if is_pi:
+    if 'raspberrypi' in os.uname().nodename.lower():
         os.environ["SDL_VIDEODRIVER"] = "fbcon"
         os.environ["SDL_FBDEV"] = "/dev/fb0"
 

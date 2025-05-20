@@ -1,12 +1,22 @@
 import pygame
+import platform
 import sys
+import os
+
+def setup_environment():
+    # Detect Raspberry Pi (Linux ARM)
+    is_pi = platform.system() == "Linux" and os.uname().machine.startswith("arm")
+
+    if is_pi:
+        os.environ["SDL_VIDEODRIVER"] = "fbcon"
+        os.environ["SDL_FBDEV"] = "/dev/fb0"
 
 def main():
     pygame.init()
 
     # Screen dimensions
-    screen_width = 800
-    screen_height = 600
+    screen_width = 1280
+    screen_height = 720
     screen = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption("Pygame Hello World")
 
@@ -36,4 +46,5 @@ def main():
     sys.exit()
 
 if __name__ == "__main__":
+    setup_environment()
     main()

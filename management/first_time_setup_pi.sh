@@ -19,13 +19,6 @@ cd "$REPO_DIR"
 sudo apt update
 sudo apt install -y python3-pip python3-venv git fbset
 
-# -- Set SDL framebuffer environment in .bashrc --
-if ! grep -q "SDL_VIDEODRIVER=fbcon" /home/pi/.bashrc; then
-    echo "Setting framebuffer environment..."
-    echo 'export SDL_VIDEODRIVER=fbcon' >> /home/pi/.bashrc
-    echo 'export SDL_FBDEV=/dev/fb0' >> /home/pi/.bashrc
-fi
-
 # -- Create and activate virtual environment --
 python3 -m venv "$VENV_DIR"
 source "$VENV_DIR/bin/activate"
@@ -54,8 +47,6 @@ StandardOutput=inherit
 StandardError=inherit
 Restart=always
 User=pi
-Environment=SDL_VIDEODRIVER=fbcon
-Environment=SDL_FBDEV=/dev/fb0
 
 [Install]
 WantedBy=multi-user.target

@@ -3,8 +3,27 @@ import os
 
 def setup_environment():
     if 'raspberrypi' in os.uname().nodename.lower():
-        os.environ["SDL_VIDEODRIVER"] = "fbcon"
-        os.environ["SDL_FBDEV"] = "/dev/fb0"
+        # os.environ["SDL_VIDEODRIVER"] = "fbcon"
+        # os.environ["SDL_FBDEV"] = "/dev/fb0"
+        # Try different video drivers in order of preference
+        drivers = ["fbcon", "directfb", "svgalib", "x11"]
+        found = False
+        for driver in drivers:
+            os.environ["SDL_VIDEODRIVER"] = driver
+            if driver == "fbcon":
+                os.environ["SDL_FBDEV"] = "/dev/fb0"
+            try:
+                import pygame
+                pygame.display.init()
+                found = True
+                print(f"Using SDL driver: {driver}")
+                break
+            except pygame.error:
+                print(f"Driver {driver} not available")
+                continue
+        if not found:
+            os.environ["SDL_VIDEODRIVER"] = "dummy"
+            print("Using dummy video driver")
 
 def main():
     pygame.init()

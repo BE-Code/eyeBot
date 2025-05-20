@@ -36,13 +36,6 @@ else
     exit 1
 fi
 
-# -- Enable framebuffer support --
-if ! grep -q "dtoverlay=vc4-fkms-v3d" /boot/config.txt; then
-    echo "Adding framebuffer support to /boot/config.txt"
-    sudo bash -c "echo 'dtoverlay=vc4-fkms-v3d' >> /boot/config.txt"
-    echo "Note: A reboot will be required for framebuffer changes to take effect"
-fi
-
 # -- Create systemd service --
 SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
 

@@ -6,8 +6,12 @@ set -e
 SCRIPT_NAME="main.py"
 SERVICE_NAME="robot-animation"
 VENV_DIR="venv"
+# Determine the script execution user for the service
+# If this script is run with sudo, $USER might be root.
+# We want the user who owns the script/repo, typically the one calling sudo.
+SERVICE_USER="${SUDO_USER:-$(whoami)}"
 
-echo "=== Robot Setup Starting ==="
+echo "=== Robot Setup Starting (Service will run as user: $SERVICE_USER) ==="
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
 ORIGINAL_DIR="$(pwd)"
@@ -35,6 +39,7 @@ fi
 # -- Create systemd service --
 SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
 
+echo "Creating systemd service file: $SERVICE_FILE"
 sudo bash -c "cat > $SERVICE_FILE" <<EOF
 [Unit]
 Description=Robot Animation
@@ -46,14 +51,15 @@ WorkingDirectory=$REPO_DIR
 StandardOutput=inherit
 StandardError=inherit
 Restart=always
-User=pi
+User=$SERVICE_USER
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
 # -- Enable and start the service --
-sudo systemctl daemon-reexec
+echo "Reloading systemd daemon, enabling and starting service..."
+sudo systemctl daemon-reload
 sudo systemctl enable $SERVICE_NAME
 sudo systemctl start $SERVICE_NAME
 

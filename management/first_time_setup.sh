@@ -48,7 +48,7 @@ Description=Robot Animation
 After=multi-user.target
 
 [Service]
-ExecStart=$REPO_DIR/management/boot.sh
+ExecStart=$REPO_DIR/management/on_boot.sh
 WorkingDirectory=$REPO_DIR
 StandardOutput=inherit
 StandardError=inherit

@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = 3000;
+const PORT = 3005;
 
 // Create a simple HTML file if it doesn't exist
 const htmlFilePath = path.join(__dirname, 'public', 'index.html');

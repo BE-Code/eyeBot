@@ -34,7 +34,7 @@ else
 fi
 
 # Kiosk mode browser command
-KIOSK_URL="http://localhost:3000" # Assuming your Node.js app serves on port 3000
+KIOSK_URL="http://localhost:3005" # Assuming your Node.js app serves on port 3005
 
 # Check if Chromium is already running in kiosk mode for this URL
 # This is a basic check; a more robust check might involve checking window titles or specific chromium flags

@@ -44,6 +44,5 @@ cd "$ORIGINAL_DIR"
 echo "
 === Development Setup Complete! ===
 Node.js dependencies are installed in the project root: $REPO_DIR
-To run the application, navigate to $REPO_DIR and use: ./management/start.sh or npm start
-(You may need to configure a 'start' script in your package.json)
+To run the application, type: npm start
 "

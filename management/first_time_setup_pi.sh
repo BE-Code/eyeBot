@@ -3,15 +3,14 @@
 set -e
 
 # -- Config --
-SCRIPT_NAME="main.py"
-SERVICE_NAME="robot-animation"
-VENV_DIR="venv"
+SERVICE_NAME="robot-kiosk"
 # Determine the script execution user for the service
 # If this script is run with sudo, $USER might be root.
 # We want the user who owns the script/repo, typically the one calling sudo.
 SERVICE_USER="${SUDO_USER:-$(whoami)}"
+APP_NAME="robotKiosk" # For the .desktop file
 
-echo "=== Robot Setup Starting (Service will run as user: $SERVICE_USER) ==="
+echo "=== Kiosk Setup Starting (Service will run as user: $SERVICE_USER) === "
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
 ORIGINAL_DIR="$(pwd)"
@@ -20,52 +19,57 @@ ORIGINAL_DIR="$(pwd)"
 cd "$REPO_DIR"
 
 # -- Install system dependencies --
+echo "Updating package lists..."
 sudo apt update
-sudo apt install -y python3-pip python3-venv git fbset libsdl2-dev python3-sdl2 libsdl2-ttf-dev libsdl2-image-dev
+echo "Installing git, Node.js, npm, Chromium, unclutter, and openbox..."
+# Install prerequisites for NodeSource script if any (e.g., curl, gpg)
+sudo apt install -y curl gpg
+# Add NodeSource repository for a specific Node.js version (e.g., Node 20)
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs git chromium-browser unclutter openbox # fbset and Python/SDL deps removed
 
-# -- Create and activate virtual environment --
-python3 -m venv "$VENV_DIR"
-source "$VENV_DIR/bin/activate"
-
-# -- Install Python dependencies --
-pip install --upgrade pip
-if [ -f "requirements.txt" ]; then
-    pip install -r requirements.txt
+# -- Install Node.js project dependencies --
+echo "Installing Node.js dependencies..."
+if [ -f "package.json" ]; then
+    npm ci --production # Use npm ci for cleaner installs from package-lock.json
 else
-    echo "Error: requirements.txt not found"
+    echo "Error: package.json not found. Please ensure your Node.js project is initialized."
     exit 1
 fi
 
-# -- Create systemd service --
-SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
+# -- Create autostart .desktop file for the user --
+AUTOSTART_DIR="/home/$SERVICE_USER/.config/autostart"
+DESKTOP_FILE="$AUTOSTART_DIR/$APP_NAME.desktop"
 
-echo "Creating systemd service file: $SERVICE_FILE"
-sudo bash -c "cat > $SERVICE_FILE" <<EOF
-[Unit]
-Description=Robot Animation
-After=multi-user.target
+echo "Creating autostart file: $DESKTOP_FILE"
+sudo -u "$SERVICE_USER" mkdir -p "$AUTOSTART_DIR" # Ensure the directory exists, create as the user
 
-[Service]
-ExecStart=$REPO_DIR/management/on_boot.sh
-WorkingDirectory=$REPO_DIR
-StandardOutput=inherit
-StandardError=inherit
-Restart=always
-User=$SERVICE_USER
-
-[Install]
-WantedBy=multi-user.target
+# Create the .desktop file as the SERVICE_USER
+# Note: on_boot.sh will be responsible for launching the browser in kiosk mode
+# and the Node.js application.
+sudo -u "$SERVICE_USER" bash -c "cat > '$DESKTOP_FILE'" <<EOF
+[Desktop Entry]
+Type=Application
+Name=$APP_NAME
+Exec=$REPO_DIR/management/on_boot.sh
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Comment=Starts the kiosk application
 EOF
 
-# -- Enable and start the service --
-echo "Reloading systemd daemon, enabling and starting service..."
-sudo systemctl daemon-reload
-sudo systemctl enable $SERVICE_NAME
-sudo systemctl start $SERVICE_NAME
+echo "Setting permissions for .desktop file..."
+sudo -u "$SERVICE_USER" chmod +x "$DESKTOP_FILE"
+
+# -- Clean up apt cache --
+sudo apt autoremove -y
+sudo apt clean
 
 # Return to original directory
 cd "$ORIGINAL_DIR"
 
 echo "=== Setup Complete! ==="
-echo "Robot should now be running on HDMI display."
-echo "To update: Restart or SSH in and run 'sudo systemctl restart $SERVICE_NAME'"
+echo "The kiosk application will attempt to start on the next login for user $SERVICE_USER."
+echo "Please ensure $SERVICE_USER is configured for automatic login if required."
+echo "To manually test the boot script, you can run: $REPO_DIR/management/on_boot.sh"
+# Systemd service parts removed

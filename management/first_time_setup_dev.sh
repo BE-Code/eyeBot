@@ -2,10 +2,6 @@
 
 set -e
 
-# -- Config --
-SCRIPT_NAME="main.py"
-VENV_DIR="venv"
-
 echo "=== Development Environment Setup Starting ==="
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
@@ -14,30 +10,32 @@ ORIGINAL_DIR="$(pwd)"
 # Change to project root
 cd "$REPO_DIR"
 
-# -- Instructions for system dependencies (manual step) --
+# -- Check for Node.js and npm --
 echo "---------------------------------------------------------------------"
-echo "Please ensure you have Python 3, pip, and venv installed."
-echo "For example, on Debian/Ubuntu: sudo apt install python3 python3-pip python3-venv"
-echo "On macOS (using Homebrew): brew install python"
-echo "---------------------------------------------------------------------"
-read -p "Press [Enter] to continue after ensuring dependencies are met..."
-
-# -- Create virtual environment --
-echo "Creating Python virtual environment in $VENV_DIR..."
-python3 -m venv "$VENV_DIR"
-
-# -- Install Python dependencies (will use the new venv automatically if script is sourced or pip is called from venv) --
-echo "Activating virtual environment to install packages..."
-source "$VENV_DIR/bin/activate"
-
-echo "Installing/updating pip..."
-pip install --upgrade pip
-
-echo "Installing Python dependencies from requirements.txt..."
-if [ -f "requirements.txt" ]; then
-    pip install -r requirements.txt
+echo "Checking for Node.js and npm..."
+if ! command -v node > /dev/null || ! command -v npm > /dev/null; then
+    echo "Node.js or npm not found."
+    echo "Please install Node.js (which includes npm). You can download it from https://nodejs.org/"
+    echo "Or use a version manager like nvm: https://github.com/nvm-sh/nvm"
+    echo "For example, on Debian/Ubuntu: sudo apt install nodejs npm"
+    echo "On macOS (using Homebrew): brew install node"
+    echo "---------------------------------------------------------------------"
+    read -p "Press [Enter] to continue after ensuring Node.js and npm are installed, or Ctrl+C to exit..."
 else
-    echo "Warning: requirements.txt not found. Skipping dependency installation."
+    echo "Node.js and npm found:"
+    node -v
+    npm -v
+fi
+echo "---------------------------------------------------------------------"
+
+# -- Install Node.js dependencies --
+echo "Installing Node.js dependencies from package.json..."
+if [ -f "package.json" ]; then
+    npm install
+else
+    echo "Error: package.json not found. Cannot install dependencies."
+    echo "Please ensure your Node.js project is initialized (e.g., with 'npm init')."
+    exit 1
 fi
 
 # Return to original directory
@@ -45,9 +43,7 @@ cd "$ORIGINAL_DIR"
 
 echo "
 === Development Setup Complete! ===
-Virtual environment '$VENV_DIR' is ready in the project root: $REPO_DIR
-To run the application, navigate to $REPO_DIR and use: ./management/start.sh
-
-If you need to install more packages or run Python tools directly,
-activate the environment first with: source $VENV_DIR/bin/activate
+Node.js dependencies are installed in the project root: $REPO_DIR
+To run the application, navigate to $REPO_DIR and use: ./management/start.sh or npm start
+(You may need to configure a 'start' script in your package.json)
 "

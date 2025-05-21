@@ -31,7 +31,13 @@ sudo apt install -y nodejs git chromium-browser unclutter openbox # fbset and Py
 # -- Install Node.js project dependencies --
 echo "Installing Node.js dependencies..."
 if [ -f "package.json" ]; then
-    npm ci --production # Use npm ci for cleaner installs from package-lock.json
+    if [ -f "package-lock.json" ]; then
+        echo "package-lock.json found, using npm ci for clean install."
+        npm ci --production
+    else
+        echo "package-lock.json not found, using npm install. This will generate a lock file."
+        npm install --production
+    fi
 else
     echo "Error: package.json not found. Please ensure your Node.js project is initialized."
     exit 1

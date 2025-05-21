@@ -50,13 +50,8 @@ else
     # --noerrdialogs: Suppresses error dialogs.
     # --disable-session-crashed-bubble: Disables the "session crashed" bubble.
     # --check-for-update-interval=31536000: Effectively disables updates (1 year in seconds)
-    # unclutter -idle 1 -root: Hides mouse cursor after 1 second of inactivity on the root window
-
-    # Start unclutter to hide the mouse cursor
-    unclutter -idle 1 -root &
 
     # Attempt to start Chromium. If it fails, log and try again or handle error.
-    # The while loop is to ensure it retries if it fails to connect to X display immediately.
     MAX_RETRIES=5
     RETRY_COUNT=0
     while ! chromium-browser --kiosk --incognito --disable-infobars --noerrdialogs --disable-session-crashed-bubble "$KIOSK_URL" > /dev/null 2>&1;

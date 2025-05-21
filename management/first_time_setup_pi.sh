@@ -21,12 +21,12 @@ cd "$REPO_DIR"
 # -- Install system dependencies --
 echo "Updating package lists..."
 sudo apt update
-echo "Installing git, Node.js, npm, Chromium, unclutter, and openbox..."
+echo "Installing git, Node.js, npm, Chromium, and openbox..."
 # Install prerequisites for NodeSource script if any (e.g., curl, gpg)
 sudo apt install -y curl gpg
 # Add NodeSource repository for a specific Node.js version (e.g., Node 20)
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs git chromium-browser unclutter openbox # fbset and Python/SDL deps removed
+sudo apt install -y nodejs git chromium-browser openbox
 
 # -- Install Node.js project dependencies --
 echo "Installing Node.js dependencies..."

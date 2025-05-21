@@ -3,53 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = 3005;
-
-// Create a simple HTML file if it doesn't exist
 const htmlFilePath = path.join(__dirname, 'public', 'index.html');
-const publicDir = path.join(__dirname, 'public');
-
-if (!fs.existsSync(publicDir)) {
-    fs.mkdirSync(publicDir);
-}
-
-if (!fs.existsSync(htmlFilePath)) {
-    const defaultHtmlContent = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kiosk Display</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #282c34;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-            font-size: 5vw;
-            text-align: center;
-        }
-        .container {
-            padding: 20px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Welcome to Kiosk Mode!</h1>
-        <p>This is a locally served page.</p>
-    </div>
-</body>
-</html>
-`;
-    fs.writeFileSync(htmlFilePath, defaultHtmlContent);
-    console.log(`Created default HTML at ${htmlFilePath}`);
-}
 
 const server = http.createServer((req, res) => {
     if (req.url === '/' || req.url === '/index.html') {
@@ -82,4 +36,4 @@ server.on('error', (error) => {
         console.error(`Server error: ${error.message}`);
     }
     process.exit(1);
-}); 
+});

@@ -9,7 +9,7 @@ This project provides a script to set up a minimal web kiosk on a Raspberry Pi, 
 
 ## Usage
 ```sh
-git clone <repo-url>
+git clone https://github.com/BE-Code/eyeBot.git
 cd eyeBot
 ./setup-kiosk.sh
 ```

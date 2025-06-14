@@ -13,7 +13,15 @@ git clone <repo-url>
 cd eyeBot
 ./setup-kiosk.sh
 ```
-The Pi will automatically reboot when setup is complete.
+After running the script, the Raspberry Pi will launch `raspi-config` automatically. Use it to enable autologin:
+
+- In the `raspi-config` menu, navigate to:
+  - **System Options**
+  - **Boot / Auto Login**
+  - **Desktop Autologin** (or **Console Autologin** if you prefer to start X manually)
+- Finish and exit `raspi-config`. The Pi will reboot.
+
+Once autologin is enabled, the kiosk will start automatically after each boot.
 
 ## Customization
 - Edit `~/.xinitrc` to change the kiosk URL or Chromium flags.

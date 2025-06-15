@@ -9,6 +9,7 @@ This project provides a script to set up a minimal web kiosk on a Raspberry Pi, 
 
 ## Usage
 ```sh
+sudo apt-get install -y git
 git clone https://github.com/BE-Code/eyeBot.git
 cd eyeBot
 ./setup-kiosk.sh
@@ -17,8 +18,8 @@ After running the script, the Raspberry Pi will launch `raspi-config` automatica
 
 - In the `raspi-config` menu, navigate to:
   - **System Options**
-  - **Boot / Auto Login**
-  - **Desktop Autologin** (or **Console Autologin** if you prefer to start X manually)
+  - **Auto Login**
+  - **Yes**
 - Finish and exit `raspi-config`. The Pi will reboot.
 
 Once autologin is enabled, the kiosk will start automatically after each boot.
